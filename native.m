@@ -11,7 +11,7 @@
 #import <string.h>
 #import "safe_c.h"
 
-static char *copyString(NSString *s)
+static char *copy_string(NSString *s)
 {
 	const char *utf8 = s.UTF8String;
 	return safe_strdup(utf8 ? utf8 : "Unknown");
@@ -21,7 +21,7 @@ char *gf_os_version(void)
 {
 	@autoreleasepool {
 		NSOperatingSystemVersion v = NSProcessInfo.processInfo.operatingSystemVersion;
-		return copyString(
+		return copy_string(
 		    [NSString stringWithFormat:@"macOS %ld.%ld.%ld", (long)v.majorVersion,
 					       (long)v.minorVersion, (long)v.patchVersion]);
 	}
@@ -80,7 +80,7 @@ char *gf_memory(void)
 	    (uint64_t)pageSize;
 	if (used > total)
 		used = total;
-	return copyString([NSString
+	return copy_string([NSString
 	    stringWithFormat:@"%.2f / %.2f GiB", used / 1073741824.0, total / 1073741824.0]);
 }
 
@@ -150,7 +150,7 @@ char *gf_gpu(void)
 
 		IOObjectRelease(iterator);
 		if (names.count)
-			return copyString([[names array] componentsJoinedByString:@", "]);
+			return copy_string([[names array] componentsJoinedByString:@", "]);
 
 		// On some Apple Silicon machines the GPU model is not exposed as a property.
 		char *cpu = gf_sysctl_string("machdep.cpu.brand_string");
@@ -193,7 +193,7 @@ char *gf_displays(void)
 	}
 
 	free(ids);
-	return copyString([displays componentsJoinedByString:@", "]);
+	return copy_string([displays componentsJoinedByString:@", "]);
 }
 
 char *gf_disk(void)
@@ -206,7 +206,7 @@ char *gf_disk(void)
 	double freeBytes = (double)fs.f_bfree * fs.f_bsize;
 	double used = total - freeBytes;
 
-	return copyString([NSString
+	return copy_string([NSString
 	    stringWithFormat:@"%.1f / %.1f GiB", used / 1073741824.0, total / 1073741824.0]);
 }
 
@@ -223,7 +223,7 @@ char *gf_uptime(void)
 		return safe_strdup("Unknown");
 
 	uint64_t sec = (uint64_t)(now - boot.tv_sec);
-	return copyString([NSString stringWithFormat:@"%llud %lluh %llum",
+	return copy_string([NSString stringWithFormat:@"%llud %lluh %llum",
 						     (unsigned long long)(sec / 86400),
 						     (unsigned long long)((sec / 3600) % 24),
 						     (unsigned long long)((sec / 60) % 60)]);
